@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name or "Your Company" }} - Contract Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 font-sans relative">
+
+    <!-- Dropdown Menu: Top-Right -->
+    <div class="absolute top-4 right-4 text-right z-20">
+        <div class="relative inline-block text-left">
+            <button id="menu-button" type="button" class="inline-flex justify-center w-full px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                ☰ Options
+            </button>
+            <div id="dropdown-menu" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                <div class="py-1">
+                    <a href="/export_csv?min_budget={{ min_budget }}&keyword={{ keyword }}&hide_zero={% if hide_zero %}1{% else %}0{% endif %}"
+                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📅 Download CSV</a>
+                    <a href="/logout"
+                       class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const button = document.getElementById('menu-button');
+        const menu = document.getElementById('dropdown-menu');
+        button.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+    </script>
+
+    <h2 class="text-2xl font-semibold mb-12 mt-4 text-center">
+        Welcome to {{ name or "Your Company" }}'s Contract Portal
+    </h2>
+
+    <form method="get" class="bg-white p-4 rounded-md shadow-sm mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-sm font-medium">Min Budget (£):</label>
+            <input type="number" name="min_budget" value="{{ min_budget }}" placeholder="e.g. 100000"
+                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium">Keyword:</label>
+            <input type="text" name="keyword" value="{{ keyword }}" placeholder="e.g. Elevator, Maintenance"
+                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+
+        <div class="flex items-center mt-6">
+            <input type="checkbox" name="hide_zero" value="1" {% if hide_zero %}checked{% endif %}
+                   class="mr-2">
+            <label>Hide £0 Budgets</label>
+        </div>
+
+        <div class="flex items-end">
+            <button type="submit"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                Apply Filters
+            </button>
+        </div>
+    </form>
+
+    <div class="mb-4 text-sm text-gray-600">
+        We've found <strong>{{ total }}</strong> matched contract{{ 's' if total != 1 else '' }} (Page {{ page }} of {{ total_pages }}).
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-sm rounded-md overflow-hidden">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3 text-left text-sm font-semibold">Title</th>
+                    <th class="p-3 text-left text-sm font-semibold">Value</th>
+                    <th class="p-3 text-left text-sm font-semibold">Deadline</th>
+                    <th class="p-3 text-left text-sm font-semibold">Location</th>
+                    <th class="p-3 text-left text-sm font-semibold">Fit Score</th>
+                    <th class="p-3 text-left text-sm font-semibold">AI Notes</th>
+                    <th class="p-3 text-left text-sm font-semibold">Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in contracts %}
+                <tr class="border-t">
+                    <td class="p-3 align-top">{{ contract.contract_title }}</td>
+                    <td class="p-3 align-top">{{ contract.contract_budget }}</td>
+                    <td class="p-3 align-top">{{ contract.contract_deadline }}</td>
+                    <td class="p-3 align-top">{{ contract.contract_location }}</td>
+                    <td class="p-3 align-top">
+                        <span class="inline-block px-3 py-1 text-white text-sm font-medium rounded-full
+                            {% if contract.fit_score >= 8 %}bg-green-600{% elif contract.fit_score >= 5 %}bg-yellow-500{% else %}bg-red-500{% endif %}">
+                            {{ contract.fit_score }}/10
+                        </span>
+                    </td>
+                    <td class="p-3 align-top">{{ contract.analysis_notes }}</td>
+                    <td class="p-3 align-top">
+                        <a href="{{ contract.contract_link }}" class="text-blue-600 hover:underline" target="_blank">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-6 flex space-x-4">
+        {% if page > 1 %}
+        <form method="get">
+            <input type="hidden" name="min_budget" value="{{ min_budget }}">
+            <input type="hidden" name="keyword" value="{{ keyword }}">
+            <input type="hidden" name="hide_zero" value="{{ '1' if hide_zero else '' }}">
+            <input type="hidden" name="page" value="{{ page - 1 }}">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Previous</button>
+        </form>
+        {% endif %}
+
+        {% if page < total_pages %}
+        <form method="get">
+            <input type="hidden" name="min_budget" value="{{ min_budget }}">
+            <input type="hidden" name="keyword" value="{{ keyword }}">
+            <input type="hidden" name="hide_zero" value="{{ '1' if hide_zero else '' }}">
+            <input type="hidden" name="page" value="{{ page + 1 }}">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Next</button>
+        </form>
+        {% endif %}
+    </div>
+
+</body>
+</html>

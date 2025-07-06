@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: matched-tenders-portal
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///persistent/gov_contracts.db
+      - key: SECRET_KEY
+        value: 5qFzE7Bh2nSeV3wNQk9tX8cV1sJiPmG6
+      - key: EMAIL_FROM
+        value: noreply@example.com
+      - key: SMTP_SERVER
+        value: smtp.mailtrap.io
+      - key: SMTP_USER
+        value: your-user
+      - key: SMTP_PASS
+        value: your-pass
+    disk:
+      name: data
+      mountPath: /persistent
+      sizeGB: 1
