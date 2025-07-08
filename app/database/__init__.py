@@ -7,7 +7,10 @@ from typing import Generator
 from app.database.base import Base
 
 # Use raw string for Windows file path, and convert backslashes to slashes.
-DATABASE_URL = "sqlite:///C:/Users/owena/OneDrive/Contract Business June 2025 Build/gov_contracts.db"
+import os
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///gov_contracts.db")
+
 
 engine = create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}
