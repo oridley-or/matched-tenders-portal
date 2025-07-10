@@ -11,4 +11,4 @@ git commit -m "Automated DB push after contract filtering"
 git push
 
 echo ✅ DB push complete — ready to deploy on Render.
-pause
+exit /b 0
