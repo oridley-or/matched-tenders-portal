@@ -77,6 +77,7 @@
                     <th class="p-3 text-left text-sm font-semibold">Deadline</th>
                     <th class="p-3 text-left text-sm font-semibold">Location</th>
                     <th class="p-3 text-left text-sm font-semibold">Fit Score</th>
+                    <th class="p-3 text-left text-sm font-semibold">Verdict</th>
                     <th class="p-3 text-left text-sm font-semibold">AI Notes</th>
                     <th class="p-3 text-left text-sm font-semibold">Link</th>
                 </tr>
@@ -93,6 +94,9 @@
                             {% if contract.fit_score >= 8 %}bg-green-600{% elif contract.fit_score >= 5 %}bg-yellow-500{% else %}bg-red-500{% endif %}">
                             {{ contract.fit_score }}/10
                         </span>
+                    </td>
+                    <td class="p-3 align-top">
+                        <span class="text-sm font-medium">{{ contract.verdict }}</span>
                     </td>
                     <td class="p-3 align-top">{{ contract.analysis_notes }}</td>
                     <td class="p-3 align-top">
